@@ -31,7 +31,26 @@ class Gestore_Robottino
     void Reset();
     void InitPin();
     long GetDistance();
+    // Enumerator for the management of the flow chart
+    enum _Stato
+    {
+      Init_,
+      Forward_,
+      Back_,
+      Turning_Left,
+      Turning_Right,
+      Obstacle,
+      Obstacle_r,
+      Obstacle_l,
+      Stop_
+    };
+    // Function that return the _Stato (enum) type
+    _Stato GetState();
+    // Function that set the _Stato (enum) value
+    void SetState(_Stato stato);
+
   private:
+  // Pinss
     int pin_f_r;
     int pin_f_l;
     int pin_b_r;
@@ -42,8 +61,12 @@ class Gestore_Robottino
     int pin_us_trig_l;
     int pin_us_echo_r;
     int pin_us_echo_l;
+    // Offest of the US
     int offset;
+    // Function for decide the direction when the us is true
     void DecicedeDirecetionNextUS();
+    // Variabile private that is the current state of the machine
+    _Stato _stato;
 };
 
 #endif

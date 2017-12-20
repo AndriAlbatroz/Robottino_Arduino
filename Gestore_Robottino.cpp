@@ -14,19 +14,20 @@
 #include "Arduino.h"
 #include "Gestore_Robottino.h"
 
-enum _Stato
-{
-  Init_,
-  Forward_,
-  Back_,
-  Turning_,
-  Stop_
-};
-
 // Constructor
 Gestore_Robottino::Gestore_Robottino()
 { 
   offset = 200;
+}
+
+Gestore_Robottino::_Stato Gestore_Robottino::GetState()
+{
+  return _stato; 
+}
+
+void Gestore_Robottino::SetState(_Stato stato)
+{
+  _stato = stato;
 }
 
 // Function for sett the pins of the 2 motors
@@ -187,5 +188,5 @@ long Gestore_Robottino::GetDistance()
 
 void Gestore_Robottino::DecicedeDirecetionNextUS()
 {
-  
+
 }
