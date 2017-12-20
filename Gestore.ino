@@ -27,7 +27,7 @@ void setup()
 
 void loop()
 {
-  if (g_Robottino.GetDistance() != 0 || g_Robottino.GetDistance() < 350) 
+  if (g_Robottino.GetDistance() != 0 || g_Robottino.GetDistance() < 5) 
   {
     g_Robottino.Stop();
     g_Robottino.Back(1000);
