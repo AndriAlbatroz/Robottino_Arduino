@@ -13,7 +13,13 @@
 #ifndef Gestore_Robottino_h
 #define Gestore_Robottino_h
 
-#include "Arduino.h"
+#if ARDUINO >= 100
+  #include "Arduino.h"
+#else
+  #include "WProgram.h"
+  #include "pins_arduino.h"
+  #include "WConstants.h"
+#endif
 
 class Gestore_Robottino
 {
@@ -21,12 +27,13 @@ class Gestore_Robottino
     Gestore_Robottino();
     void Set_Motor(int pin_f_r_, int pin_f_l_, int pin_b_r_, int pin_b_l_, int pin_en_r_, int pin_en_l_);
     void Set_US(int pin_us_trig_r_, int pin_us_trig_l_, int pin_us_echo_r_, int pin_us_echo_l_);
-    void Turn_For_Left(int degree, bool use_previus_direction);
-    void Turn_For_Right(int degree, bool use_previus_direction);
-    void Turn_Back_Left(int degree, bool use_previus_direction);
-    void Turn_Back_Right(int degree, bool use_previus_direction);
+    void Turn_For_Left(int degree);
+    void Turn_For_Right(int degree);
+    void Turn_Back_Left(int degree);
+    void Turn_Back_Right(int degree);
     void For();
     void Back();
+    void Back(int seconds);
     void Stop();
     void Reset();
     void InitPin();
@@ -67,6 +74,8 @@ class Gestore_Robottino
     void DecicedeDirecetionNextUS();
     // Variabile private that is the current state of the machine
     _Stato _stato;
+    long current_time;
+    long previus_time;
 };
 
 #endif

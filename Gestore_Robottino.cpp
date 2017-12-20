@@ -11,20 +11,30 @@
 *********************************************************/
 
 // Inclued all the lib's that i need
-#include "Arduino.h"
+#if ARDUINO >= 100
+  #include "Arduino.h"
+#else
+  #include "WProgram.h"
+  #include "pins_arduino.h"
+  #include "WConstants.h"
+#endif
+
 #include "Gestore_Robottino.h"
 
 // Constructor
 Gestore_Robottino::Gestore_Robottino()
 { 
   offset = 200;
+  SetState(_Stato::Init_);
 }
 
+// Function return the state value
 Gestore_Robottino::_Stato Gestore_Robottino::GetState()
 {
   return _stato; 
 }
 
+// Function set the state value
 void Gestore_Robottino::SetState(_Stato stato)
 {
   _stato = stato;
@@ -73,7 +83,7 @@ void Gestore_Robottino::InitPin()
 }
 
 // Function for turn left in the forward direction at the n degrees
-void Gestore_Robottino::Turn_For_Left(int degree, bool use_previus_direction) 
+void Gestore_Robottino::Turn_For_Left(int degree) 
 {
   if (degree == 0) return;
 
@@ -84,10 +94,14 @@ void Gestore_Robottino::Turn_For_Left(int degree, bool use_previus_direction)
     digitalWrite(pin_f_r, true);
     digitalWrite(pin_b_r, false);
   }
+
+  Reset();
+
+  DecicedeDirecetionNextUS();
 }
 
 // Function for turn right in the forward direction at the n degrees
-void Gestore_Robottino::Turn_For_Right(int degree, bool use_previus_direction) 
+void Gestore_Robottino::Turn_For_Right(int degree) 
 {
   if (degree == 0) return;
 
@@ -99,10 +113,11 @@ void Gestore_Robottino::Turn_For_Right(int degree, bool use_previus_direction)
     digitalWrite(pin_f_r, false);
   }
 
+  DecicedeDirecetionNextUS();
 }
 
 // Function for turn left in the back direction at the n degrees
-void Gestore_Robottino::Turn_Back_Left(int degree, bool use_previus_direction) 
+void Gestore_Robottino::Turn_Back_Left(int degree) 
 {
   if (degree == 0) return;
 
@@ -113,10 +128,12 @@ void Gestore_Robottino::Turn_Back_Left(int degree, bool use_previus_direction)
     digitalWrite(pin_b_r, true);
     digitalWrite(pin_b_l, false);
   }
+
+ DecicedeDirecetionNextUS();
 }
 
 // Function for turn right in the back direction at the n degrees
-void Gestore_Robottino::Turn_Back_Right(int degree, bool use_previus_direction)
+void Gestore_Robottino::Turn_Back_Right(int degree)
 {
   if (degree == 0) return;
 
@@ -127,15 +144,41 @@ void Gestore_Robottino::Turn_Back_Right(int degree, bool use_previus_direction)
     digitalWrite(pin_b_l, true);
     digitalWrite(pin_b_r, false);
   }
-}
 
+  DecicedeDirecetionNextUS();
+}
+  
 // Function for start the robot in the back direction
 void Gestore_Robottino::Back() 
 {
   Reset();
 
+  SetState(_Stato::Back_);
+  
   digitalWrite(pin_b_r, true);
   digitalWrite(pin_b_l, true);
+}
+
+void Gestore_Robottino::Back(int seconds)
+{
+  if (seconds == 0) return;
+  
+  int n = seconds;
+
+  current_time = millis();
+
+  Back();
+
+  while ((current_time - previus_time) > seconds)
+  {
+    current_time = millis();
+  } 
+
+  previus_time = current_time;
+  current_time = 0;
+
+  Stop();
+ 
 }
 
 // Function for start the robot in the forward direction
@@ -143,6 +186,8 @@ void Gestore_Robottino::For()
 {
   Reset();
 
+  SetState(_Stato::Forward_);
+  
   digitalWrite(pin_f_l, true);
   digitalWrite(pin_f_r, true);
 }
@@ -150,6 +195,8 @@ void Gestore_Robottino::For()
 // Function for stop the robot
 void Gestore_Robottino::Stop()
 {
+  SetState(_Stato::Stop_);
+
   Reset();
 }
 
@@ -177,9 +224,17 @@ long Gestore_Robottino::GetDistance()
   long distanza_r = 0.034 * pulseIn(pin_us_echo_r, true) / 2;
   long distanza_l = 0.034 * pulseIn(pin_us_echo_l, true) / 2;
 
-  if ((distanza_r - distanza_l) > offset) 
+  if ((distanza_r - distanza_l) > offset)
   {
-    
+    SetState(_Stato::Obstacle_l);    
+    DecicedeDirecetionNextUS();
+    return;    
+  }
+  else if ((distanza_r - distanza_l) < offset) 
+  {
+    SetState(_Stato::Obstacle_r);
+    DecicedeDirecetionNextUS();
+    return;
   }
 
   return (distanza_r + distanza_l) / 2;  // Return average of the 2 values
@@ -188,5 +243,13 @@ long Gestore_Robottino::GetDistance()
 
 void Gestore_Robottino::DecicedeDirecetionNextUS()
 {
-
+  switch(GetState())
+  {
+    case _Stato::Forward_:
+      For();
+    break;
+    case _Stato::Back_:
+      Back();
+    break;
+  }
 }
