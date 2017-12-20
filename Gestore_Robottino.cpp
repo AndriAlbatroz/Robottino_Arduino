@@ -26,6 +26,7 @@ enum _Stato
 // Constructor
 Gestore_Robottino::Gestore_Robottino()
 { 
+  offset = 200;
 }
 
 // Function for sett the pins of the 2 motors
@@ -175,6 +176,16 @@ long Gestore_Robottino::GetDistance()
   long distanza_r = 0.034 * pulseIn(pin_us_echo_r, true) / 2;
   long distanza_l = 0.034 * pulseIn(pin_us_echo_l, true) / 2;
 
+  if ((distanza_r - distanza_l) > offset) 
+  {
+    
+  }
+
   return (distanza_r + distanza_l) / 2;  // Return average of the 2 values
 
+}
+
+void Gestore_Robottino::DecicedeDirecetionNextUS()
+{
+  
 }

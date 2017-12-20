@@ -42,15 +42,8 @@ class Gestore_Robottino
     int pin_us_trig_l;
     int pin_us_echo_r;
     int pin_us_echo_l;
-    enum State
-    {
-      Init_,
-      Forward_,
-      Back_,
-      Turning_,
-      Stop_
-    };
-    State stato;
+    int offset;
+    void DecicedeDirecetionNextUS();
 };
 
 #endif
