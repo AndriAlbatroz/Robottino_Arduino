@@ -33,7 +33,6 @@ class Gestore_Robottino
     void Turn_Back_Right(int degree);
     void For();
     void Back();
-    void Back(int seconds);
     void Stop();
     void Reset();
     void InitPin();

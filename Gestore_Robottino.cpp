@@ -159,28 +159,6 @@ void Gestore_Robottino::Back()
   digitalWrite(pin_b_l, true);
 }
 
-void Gestore_Robottino::Back(int seconds)
-{
-  if (seconds == 0) return;
-  
-  int n = seconds;
-
-  current_time = millis();
-
-  Back();
-
-  while ((current_time - previus_time) > seconds)
-  {
-    current_time = millis();
-  } 
-
-  previus_time = current_time;
-  current_time = 0;
-
-  Stop();
- 
-}
-
 // Function for start the robot in the forward direction
 void Gestore_Robottino::For() 
 {
@@ -213,31 +191,19 @@ void Gestore_Robottino::Reset()
 long Gestore_Robottino::GetDistance()
 {
   digitalWrite(pin_us_trig_r, false);
-  digitalWrite(pin_us_trig_l, false);
-
   digitalWrite(pin_us_trig_r, true);
-  digitalWrite(pin_us_trig_l, true);
   delayMicroseconds(10);
   digitalWrite(pin_us_trig_r, false);
-  digitalWrite(pin_us_trig_l, false);
-
   long distanza_r = 0.034 * pulseIn(pin_us_echo_r, true) / 2;
+  
+  digitalWrite(pin_us_trig_l, false);
+  digitalWrite(pin_us_trig_l, true);
+  delayMicroseconds(10);
+  digitalWrite(pin_us_trig_l, false);
+  
   long distanza_l = 0.034 * pulseIn(pin_us_echo_l, true) / 2;
 
-  if ((distanza_r - distanza_l) > offset)
-  {
-    SetState(_Stato::Obstacle_l);    
-    DecicedeDirecetionNextUS();
-    return;    
-  }
-  else if ((distanza_r - distanza_l) < offset) 
-  {
-    SetState(_Stato::Obstacle_r);
-    DecicedeDirecetionNextUS();
-    return;
-  }
-
-  return (distanza_r + distanza_l) / 2;  // Return average of the 2 values
+  return (distanza_l + distanza_r) / 2;  // Return average of the 2 values
 
 }
 
